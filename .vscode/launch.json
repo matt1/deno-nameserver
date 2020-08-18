@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Deno",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": ["run", "--unstable", "--allow-net", "--inspect-brk", "-A", "main.ts"],
+      "outputCapture": "std",
+      "attachSimplePort": 9229
+    }
+  ]
+}

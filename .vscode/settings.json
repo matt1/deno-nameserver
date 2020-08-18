@@ -1,0 +1,9 @@
+// .vscode/settings.json
+{
+  "deno.enable": true,
+  "deno.unstable": true ,
+
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+  },
+}
