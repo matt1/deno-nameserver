@@ -4,13 +4,19 @@ import { DNSRecordClass } from "./dns_record_class.ts";
 
 // Handy picture: https://www.securityartwork.es/wp-content/uploads/2013/02/DNS.jpg
 
-/** An abstract class that contains a "name" in DNS. */
-export abstract class DNSNameMessage {
+/** 
+ * An abstract class that contains a resource record.
+ * See https://tools.ietf.org/html/rfc1035#section-4.1.3 for details.
+ */
+export abstract class ResourceRecord {
   Name: string = "";
   NameParts: string[] = [];
+  RecordType = DNSRecordType.UNKNOWN;
+  RecordClass = DNSRecordClass.UNKNOWN;
+  TTL = 0;
 
   get Bytes(): Uint8Array {
-    const result = new Uint8Array(this.Name.length + 1);
+    const result = new Uint8Array(this.Name.length + 10);
     const view = new DataView(result.buffer);
 
     let index = 0;
@@ -22,6 +28,11 @@ export abstract class DNSNameMessage {
 
       index = index + 1 + part.length;
     }
+
+    view.setUint16(index += 1, this.RecordType);
+    view.setUint16(index += 2, this.RecordClass);
+    view.setUint32(index += 2, this.TTL);
+    
 
     return result;
   }
@@ -79,7 +90,9 @@ export class DNSHeader {
 }
 
 /** A DNS Packet's Question. */
-export class DNSQuestion extends DNSNameMessage {
+export class DNSQuestion {
+  Name: string = "";
+  NameParts: string[] = [];
   /** The Record Type (e.g. A, AAAA etc). */
   RecordType: number = 0;
   /** The Record Class - typically only IN. */
@@ -93,14 +106,21 @@ export class DNSQuestion extends DNSNameMessage {
 
   /** Get the protocol bytes for the question. */
   get Bytes(): Uint8Array {
-    const dnsNameBytes = super.Bytes;
-    const result = new Uint8Array(dnsNameBytes.length + 5);
+    const result = new Uint8Array(this.Name.length + 6);
     const view = new DataView(result.buffer);
-    result.set(dnsNameBytes, 0);
 
-    view.setUint16(dnsNameBytes.length + 1, this.RecordType);
-    view.setUint16(dnsNameBytes.length + 3, this.RecordClass);
+    let index = 0;
+    for (const part of this.NameParts) {
+      view.setUint8(index, part.length);
+      for (let i = 0; i < part.length; i++) {
+        view.setUint8(index + 1 + i, part.charCodeAt(i));
+      }
 
+      index = index + 1 + part.length;
+    }
+
+    view.setUint16(index += 1, this.RecordType);
+    view.setUint16(index += 2, this.RecordClass);
     return result;
   }
 
@@ -141,7 +161,8 @@ export class DNSQuestion extends DNSNameMessage {
 }
 
 /** A DNS Packet's Answer. */
-export class DNSAnswer extends DNSNameMessage {
+export class DNSAnswer extends ResourceRecord {
+  // TODO: create subclasses for A, AAAA, MX etc.
   constructor(
     readonly Question: DNSQuestion,
     readonly TTL: number,
@@ -156,25 +177,23 @@ export class DNSAnswer extends DNSNameMessage {
 
   /** Get the protocol bytes for the question. */
   get Bytes(): Uint8Array {
-    const dnsNameBytes = super.Bytes;
-    const result = new Uint8Array(dnsNameBytes.length + 15);
+    const recordBytes = super.Bytes;
+    const result = new Uint8Array(recordBytes.length + 6);
     const view = new DataView(result.buffer);
-    result.set(dnsNameBytes, 0);
-
-    let offset = dnsNameBytes.length + 1;
-    view.setUint16(offset, this.RecordType);
-    view.setUint16(offset += 2, this.RecordClass);
-    view.setUint32(offset += 2, this.TTL);
+    result.set(recordBytes, 0);
+    let offset = recordBytes.length;
     
     switch (this.RecordType) {
       case DNSRecordType.A:
-        view.setUint16(offset += 4, 4);
+        view.setUint16(offset, 4);
         view.setUint32(offset += 2, this.Address);
         break;
       // TODO: IPv6 support
       default:
         throw new Error('Unrecognised record type.');
     }
+
+    console.log(result);
     return result;
   }
 }
