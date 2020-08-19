@@ -8,6 +8,7 @@ not offer recursive lookups.
 
 Obviously this is **not stable and not for production use**!
 
-## Why? Why don't you use `dnsmasq`/whatever?
+## Why? Why don't you use `dnsmasq` or whatever?
 
-Just for fun.
+This was just written for the fun of it. I needed a simple DNS server and I
+thought it would be more fun to write my own than read the docs for dnsmasq.

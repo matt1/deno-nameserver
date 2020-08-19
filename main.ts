@@ -9,9 +9,9 @@ const listener = Deno.listenDatagram({
 
 while (true) {
   try {
-  const [data, remoteAddr] = await listener.receive();  
-  const response = dnsServer.HandleRequest(data);
-  await listener.send(response, remoteAddr);
+    const [data, remoteAddr] = await listener.receive();  
+    const response = dnsServer.HandleRequest(data);
+    await listener.send(response, remoteAddr);
   } catch (error) {
     console.error(error);
   }
