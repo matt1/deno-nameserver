@@ -8,6 +8,7 @@ import { numberToIpv4 } from "./utils.ts";
 /** A simple DNS Server. */
 export class DNSServer {
 
+  // TODO: load from JSON at start-up
   serverConfig: DNSConfig = {
     "example.com": {
       ttl: 3600,

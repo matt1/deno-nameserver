@@ -1,7 +1,7 @@
-# Deno DNS Server
+# `deno-nameserver` is a DNS Server written using Deno
 
-A very basic experiment at writing a simple DNS server in Deno, using the
-currently-unstable UDP datagram support.
+This very basic experiment at writing a simple DNS server using Deno, using the
+currently-unstable UDP datagram support in Deno (i.e. you have to run with `--unstable`).
 
 It is intended to act as a local server to respond to basic queries, and does
 not offer recursive lookups.
