@@ -7,27 +7,28 @@
  * 
  *  {
  *  "example.com" : {
- *      "ttl": 3600,
+ *    "ttl": 3600,
+ *    "class": {
  *      "IN" : {
  *          "A": "127.0.0.1",
  *          "AAAA": "::1",
  *      },
+ *    },
  *  },        
 };
  */
 
-interface DNSConfig {
-  [key:string]: DNSConfigName;
+export interface DNSConfig {
+  [key:string]: DNSConfigRecord;
 }
 
-interface DNSConfigName {
-  [key:string]: DNSConfigRecordClass;
+export interface DNSConfigRecord {
+  ttl: number,
+  class: {
+    [key:string]: DNSConfigRecordClass;
+  }
 }
 
 interface DNSConfigRecordClass {
   [key:string]: string;
-}
-
-interface DNSConfigRecordType {
-[key:string]: string;
 }

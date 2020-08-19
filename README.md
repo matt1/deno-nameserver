@@ -7,3 +7,7 @@ It is intended to act as a local server to respond to basic queries, and does
 not offer recursive lookups.
 
 Obviously this is **not stable and not for production use**!
+
+## Why? Why don't you use `dnsmasq`/whatever?
+
+Just for fun.

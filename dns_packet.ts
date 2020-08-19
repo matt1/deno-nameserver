@@ -145,9 +145,9 @@ export class DNSAnswer extends DNSNameMessage {
   constructor(
     readonly Question: DNSQuestion,
     readonly TTL: number,
-    readonly Ipv4Address: Uint8Array[4],
-    readonly Type: number,
-    readonly RecordClass: number,
+    readonly Address: number,
+    readonly RecordClass: DNSRecordClass,
+    readonly RecordType: DNSRecordType,
   ) {
     super();
     this.Name = Question.Name;
@@ -162,14 +162,19 @@ export class DNSAnswer extends DNSNameMessage {
     result.set(dnsNameBytes, 0);
 
     let offset = dnsNameBytes.length + 1;
-    view.setUint16(offset, this.Type);
+    view.setUint16(offset, this.RecordType);
     view.setUint16(offset += 2, this.RecordClass);
     view.setUint32(offset += 2, this.TTL);
-    // TODO: Data length must be dynamic
-    view.setUint16(offset += 4, 4);
-    // TODO: Handle IPv6
-    view.setUint32(offset += 2, this.Ipv4Address);
-
+    
+    switch (this.RecordType) {
+      case DNSRecordType.A:
+        view.setUint16(offset += 4, 4);
+        view.setUint32(offset += 2, this.Address);
+        break;
+      // TODO: IPv6 support
+      default:
+        throw new Error('Unrecognised record type.');
+    }
     return result;
   }
 }
