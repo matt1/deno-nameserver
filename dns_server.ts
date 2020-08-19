@@ -1,7 +1,7 @@
-import { DNSPacket, DNSAnswer } from "./dns_packet.ts";
+import { DNSPacket } from "./dns_packet.ts";
 import { DNSConfig, DNSConfigRecord } from "./dns_server_config.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
-import { DNSRecordType } from "./dns_record_type.ts";
+import { DNSRecordType, AResourceRecord } from "./dns_record_type.ts";
 import { numberToIpv4 } from "./utils.ts";
 
 
@@ -37,11 +37,13 @@ export class DNSServer {
     let address;
     try {
       config = this.serverConfig[question.Name];
+      
       if (!config) throw new Error(`No config for ${question.Name}`);
-
       if (!config.class[recordClass]) throw new Error(`No config for class '${recordClass}' for ${question.Name}`);
       if (!config.class[recordClass][recordType]) throw new Error(`No config for type '${recordType}' for ${question.Name}`);
+
       address = config.class[recordClass][recordType];
+
       if (!address) throw new Error(`No address`);
     } catch (error) {
       console.error(`Error handling request: ${error}`);
@@ -59,12 +61,15 @@ export class DNSServer {
 
     packet.Header.Flags = 32768; // 0x8000
     packet.Header.TotalAnswers = 1;
-    packet.Answer = new DNSAnswer(
-      packet.Question,
-      config.ttl,
-      numberToIpv4(address),
+
+    // TODO - factory for resource record types.
+    packet.Answer = new AResourceRecord(
+      packet.Question.Name,
+      packet.Question.NameParts,
       packet.Question.RecordType,
       packet.Question.RecordClass,
+      config.ttl,
+      numberToIpv4(address),  // TODO: should be handled in the RR.
     );
     return new Uint8Array(packet.Bytes);
   }

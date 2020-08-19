@@ -1,40 +1,8 @@
 import { hex } from "./utils.ts";
-import { DNSRecordType } from "./dns_record_type.ts";
+import { DNSRecordType, ResourceRecord } from "./dns_record_type.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 
 // Handy picture: https://www.securityartwork.es/wp-content/uploads/2013/02/DNS.jpg
-
-/** 
- * An abstract class that contains a resource record.
- * See https://tools.ietf.org/html/rfc1035#section-4.1.3 for details.
- */
-export abstract class ResourceRecord {
-  Name: string = "";
-  NameParts: string[] = [];
-  RecordType = DNSRecordType.UNKNOWN;
-  RecordClass = DNSRecordClass.UNKNOWN;
-  TTL = 0;
-
-  get Bytes(): Uint8Array {
-    const result = new Uint8Array(this.Name.length + 10);
-    const view = new DataView(result.buffer);
-
-    let index = 0;
-    for (const part of this.NameParts) {
-      view.setUint8(index, part.length);
-      for (let i = 0; i < part.length; i++) {
-        view.setUint8(index + 1 + i, part.charCodeAt(i));
-      }
-      index = index + 1 + part.length;
-    }
-
-    view.setUint16(index += 1, this.RecordType);
-    view.setUint16(index += 2, this.RecordClass);
-    view.setUint32(index += 2, this.TTL);
-    
-    return result;
-  }
-}
 
 /** DNS Packet Header. */
 export class DNSHeader {
@@ -156,43 +124,6 @@ export class DNSQuestion {
   }
 }
 
-/** A DNS Packet's Answer. */
-export class DNSAnswer extends ResourceRecord {
-  // TODO: create subclasses for A, AAAA, MX etc.
-  constructor(
-    readonly Question: DNSQuestion,
-    readonly TTL: number,
-    readonly Address: number,
-    readonly RecordClass: DNSRecordClass,
-    readonly RecordType: DNSRecordType,
-  ) {
-    super();
-    this.Name = Question.Name;
-    this.NameParts = Question.NameParts;
-  }
-
-  /** Get the protocol bytes for the question. */
-  get Bytes(): Uint8Array {
-    const recordBytes = super.Bytes;
-    const result = new Uint8Array(recordBytes.length + 6);
-    const view = new DataView(result.buffer);
-    result.set(recordBytes, 0);
-    let offset = recordBytes.length;
-    
-    switch (this.RecordType) {
-      case DNSRecordType.A:
-        view.setUint16(offset, 4);
-        view.setUint32(offset += 2, this.Address);
-        break;
-      // TODO: IPv6 support
-      default:
-        throw new Error('Unrecognised record type.');
-    }
-    console.log(result);
-    return result;
-  }
-}
-
 /** Represents a DNS packet. */
 export class DNSPacket {
   /** Copy of the raw data. */
@@ -208,7 +139,7 @@ export class DNSPacket {
   private question!: DNSQuestion;
 
   /** Private copy of the answer (there may not be an answer). */
-  private answer!: DNSAnswer | undefined;
+  private answer!: ResourceRecord | undefined;
 
   /** Get the header for this packet. */
   get Header(): DNSHeader {
@@ -227,12 +158,12 @@ export class DNSPacket {
   }
 
   /** Get the answer for this packet, if available. */
-  get Answer(): DNSAnswer | undefined {
+  get Answer(): ResourceRecord | undefined {
     return this.answer;
   }
 
   /** Set the answer for this packet. */
-  set Answer(answer:DNSAnswer | undefined) {
+  set Answer(answer:ResourceRecord | undefined) {
     this.answer = answer;
   }
 
