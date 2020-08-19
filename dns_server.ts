@@ -9,14 +9,6 @@ import { numberToIpv4 } from "./utils.ts";
 export class DNSServer {
 
   serverConfig: DNSConfig = {
-    "api.github.com": {
-      ttl: 3600,
-      class: {
-        "IN": {
-          "A": "127.0.0.1",
-        }
-      }
-    },
     "example.com": {
       ttl: 3600,
       class: {

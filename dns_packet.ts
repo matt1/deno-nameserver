@@ -25,7 +25,6 @@ export abstract class ResourceRecord {
       for (let i = 0; i < part.length; i++) {
         view.setUint8(index + 1 + i, part.charCodeAt(i));
       }
-
       index = index + 1 + part.length;
     }
 
@@ -33,7 +32,6 @@ export abstract class ResourceRecord {
     view.setUint16(index += 2, this.RecordClass);
     view.setUint32(index += 2, this.TTL);
     
-
     return result;
   }
 }
@@ -55,8 +53,6 @@ export class DNSHeader {
        Total Answers: ${hex(this.TotalAnswers)}
        Total Auth RR: ${hex(this.TotalAuthorityResourceRecords)}
  Total Additional RR: ${hex(this.TotalAdditionalResourceRecords)}`;
-
-  
   }
 
   /** Get the protocol bytes for the header. */
@@ -91,7 +87,9 @@ export class DNSHeader {
 
 /** A DNS Packet's Question. */
 export class DNSQuestion {
+  /** The human-friendly name */
   Name: string = "";
+  /** The separate parts of the name. */
   NameParts: string[] = [];
   /** The Record Type (e.g. A, AAAA etc). */
   RecordType: number = 0;
@@ -115,7 +113,6 @@ export class DNSQuestion {
       for (let i = 0; i < part.length; i++) {
         view.setUint8(index + 1 + i, part.charCodeAt(i));
       }
-
       index = index + 1 + part.length;
     }
 
@@ -155,7 +152,6 @@ export class DNSQuestion {
     question.Name = question.NameParts.join(".");
     question.RecordType = data.getUint16(index += 1);
     question.RecordClass = data.getUint16(index += 2);
-
     return question;
   }
 }
@@ -192,7 +188,6 @@ export class DNSAnswer extends ResourceRecord {
       default:
         throw new Error('Unrecognised record type.');
     }
-
     console.log(result);
     return result;
   }
