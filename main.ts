@@ -1,9 +1,10 @@
 import { DNSServer } from "./dns_server.ts";
+import { Config } from "./config.ts";
 
 const dnsServer = new DNSServer();
 const listener = Deno.listenDatagram({
-  port: 53,
-  hostname: '192.168.1.43',
+  port: Config.PORT,
+  hostname: Config.IP,
   transport: 'udp',
 });
 

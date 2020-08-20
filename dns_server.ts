@@ -3,24 +3,11 @@ import { DNSConfig, DNSConfigRecord } from "./dns_server_config.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType, AResourceRecord } from "./dns_record_type.ts";
 import { numberToIpv4 } from "./utils.ts";
-
+import { Config } from "./config.ts";
 
 /** A simple DNS Server. */
 export class DNSServer {
-
-  // TODO: load from JSON at start-up
-  serverConfig: DNSConfig = {
-    "example.com": {
-      ttl: 3600,
-      class: {
-        "IN": {
-          "A": "127.0.0.1",
-        }
-      }
-    }
-  };
-
-  /** 
+  /**
    * Handles a raw DNS request. Request payload should be the raw datagram
    * content.
    * 
@@ -37,7 +24,7 @@ export class DNSServer {
     let config:DNSConfigRecord;
     let address;
     try {
-      config = this.serverConfig[question.Name];
+      config = Config.NAMES[question.Name];
       
       if (!config) throw new Error(`No config for ${question.Name}`);
       if (!config.class[recordClass]) throw new Error(`No config for class '${recordClass}' for ${question.Name}`);
