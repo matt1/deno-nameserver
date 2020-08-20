@@ -20,9 +20,10 @@ export abstract class ResourceRecord {
   RecordClass = DNSRecordClass.UNKNOWN;
   TTL = 0;
 
+  /** Get the bytes for this resource record. */
   get Bytes(): Uint8Array {
-    const result = new Uint8Array(this.Name.length + 10);
-    const view = new DataView(result.buffer);
+    const common = new Uint8Array(this.Name.length + 10);
+    let view = new DataView(common.buffer);
 
     let index = 0;
     for (const part of this.NameParts) {
@@ -36,9 +37,20 @@ export abstract class ResourceRecord {
     view.setUint16(index += 1, this.RecordType);
     view.setUint16(index += 2, this.RecordClass);
     view.setUint32(index += 2, this.TTL);
+
+    const payload = this.Payload;
+    const result = new Uint8Array(common.length + 2 + payload.length);
+    result.set(common, 0);
+    view = new DataView(result.buffer);
+
+    view.setUint16(index +=4, payload.length);
+    result.set(payload, index += 2);
     
     return result;
   }
+
+  /** Get the payload for this resource record. */
+  abstract get Payload(): Uint8Array;
 }
 
 /** A Resource Record for 'A' record types. */
@@ -54,15 +66,12 @@ export class AResourceRecord extends ResourceRecord {
     super();
   }
 
-  get Bytes():Uint8Array {
-    const commonBytes = super.Bytes;
-    const result = new Uint8Array(commonBytes.length + 6);
+  /** Returns the IPv4 address as an unsigned 32 bit int. */
+  get Payload():Uint8Array {
+    const result = new Uint8Array(4);
     const view = new DataView(result.buffer);
-    let offset = commonBytes.length;
-    result.set(commonBytes, 0);
-
-    view.setUint16(offset, 4);
-    view.setUint32(offset += 2, this.Address);
+  
+    view.setUint32(0, this.Address);
     return result;
   }
 }
