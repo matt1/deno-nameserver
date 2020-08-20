@@ -11,6 +11,10 @@ export enum DNSRecordType {
 
 /** 
  * An abstract class that contains a resource record.
+ * 
+ * Classes that extend this class must provide a `Payload` that will be added to
+ * this resource record when the `Bytes` are generated.
+ * 
  * See https://tools.ietf.org/html/rfc1035#section-4.1.3 for details.
  */
 export abstract class ResourceRecord {
