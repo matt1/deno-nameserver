@@ -9,11 +9,11 @@ export class Config {
 
   /** The list of names that the server will serve records for. */
   public static readonly NAMES:DNSConfig = {
-    "example.com": {
+    'example.com': {
       ttl: 3600,
       class: {
-        "IN": {
-          "A": "127.0.0.1",
+        'IN': {
+          'A': '127.0.0.1',
         }
       }
     }
