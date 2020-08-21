@@ -1,5 +1,7 @@
 # `deno-nameserver` is a DNS Server written using Deno
 
+![Tests](https://github.com/matt1/deno-nameserver/workflows/Tests/badge.svg)
+
 This is a very basic experiment at writing a simple DNS server using Deno, using
 the currently-unstable UDP datagram support in Deno (i.e. you have to run with `--unstable`).
 
