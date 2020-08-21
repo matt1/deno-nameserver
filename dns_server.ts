@@ -1,12 +1,12 @@
 import { DNSPacket } from "./dns_packet.ts";
-import { DNSConfig, DNSConfigRecord } from "./dns_server_config.ts";
+import { DNSConfigRecord, DNSConfig } from "./dns_server_config.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType, AResourceRecord } from "./dns_record_type.ts";
 import { numberToIpv4 } from "./utils.ts";
-import { Config } from "./config.ts";
 
 /** A simple DNS Server. */
 export class DNSServer {
+  constructor(private readonly config:DNSConfig){}
   /**
    * Handles a raw DNS request. Request payload should be the raw datagram
    * content.
@@ -24,7 +24,7 @@ export class DNSServer {
     let config:DNSConfigRecord;
     let address;
     try {
-      config = Config.NAMES[question.Name];
+      config = this.config[question.Name];
       
       if (!config) throw new Error(`No config for ${question.Name}`);
       if (!config.class[recordClass]) throw new Error(`No config for class '${recordClass}' for ${question.Name}`);

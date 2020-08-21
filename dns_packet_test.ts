@@ -4,12 +4,14 @@ import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType } from "./dns_record_type.ts";
 
 Deno.test('DNSPacket can be created from raw request bytes', () => {
-  const data =  Uint8Array.from([0, 5, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 101,
-      120, 97, 109, 112, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1]);
-  
+  // Direct from a wireshark DNS capture made by Win10 `nslookup`.
+  const data =  Uint8Array.from([
+      0x00, 0x04, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65, 0x78, 0x61,
+      0x6d, 0x70, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00, 0x00, 0x01, 0x00, 0x01,
+  ]);
   const packet = new DNSPacket(data);
 
-  assertEquals(packet.Header.Identification, 5);
+  assertEquals(packet.Header.Identification, 4);
   assertEquals(packet.Header.TotalQuestions, 1);
   assertEquals(packet.Header.TotalAnswers, 0);
   assertEquals(packet.Header.TotalAdditionalResourceRecords, 0);

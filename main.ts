@@ -1,7 +1,7 @@
 import { DNSServer } from "./dns_server.ts";
 import { Config } from "./config.ts";
 
-const dnsServer = new DNSServer();
+const dnsServer = new DNSServer(Config.NAMES);
 const listener = Deno.listenDatagram({
   port: Config.PORT,
   hostname: Config.IP,
