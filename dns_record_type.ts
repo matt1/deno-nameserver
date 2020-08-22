@@ -18,11 +18,13 @@ export enum DNSRecordType {
  * See https://tools.ietf.org/html/rfc1035#section-4.1.3 for details.
  */
 export abstract class ResourceRecord {
-  Name: string = "";
-  NameParts: string[] = [];
-  RecordType = DNSRecordType.UNKNOWN;
-  RecordClass = DNSRecordClass.UNKNOWN;
-  TTL = 0;
+  constructor(
+    readonly Name = '',
+    readonly NameParts: string[] = [],
+    readonly RecordType = DNSRecordType.UNKNOWN,
+    readonly RecordClass = DNSRecordClass.UNKNOWN,
+    readonly TTL = 0,
+  ){}
 
   /** Get the bytes for this resource record. */
   get Bytes(): Uint8Array {
@@ -59,16 +61,8 @@ export abstract class ResourceRecord {
 
 /** A Resource Record for 'A' record types. */
 export class AResourceRecord extends ResourceRecord {
-  constructor(
-    readonly Name: string,
-    readonly NameParts: string[],
-    readonly RecordType: DNSRecordType,
-    readonly RecordClass: DNSRecordClass,
-    readonly TTL: number,
-    readonly Address: number,
-  ){
-    super();
-  }
+  /** The IPv4 address (as a decimal). */
+  Address: number = 0;
 
   /** Returns the IPv4 address as an unsigned 32 bit int. */
   get Payload():Uint8Array {
@@ -76,6 +70,38 @@ export class AResourceRecord extends ResourceRecord {
     const view = new DataView(result.buffer);
   
     view.setUint32(0, this.Address);
+    return result;
+  }
+}
+
+/** A Resource Record for CNAMEs. */
+export class CNameResourceRecord extends ResourceRecord {
+  /** The CNAME alias. */
+  CName = '';
+
+  get Payload():Uint8Array {
+    const result = new Uint8Array(this.CName.length);
+    const view = new DataView(result.buffer);
+  
+    for (let i = 0; i<this.CName.length; i++) {
+      view.setUint8(i, this.CName.charCodeAt(i));
+    }
+    return result;
+  }
+}
+
+/** A Resource Record for TXT. */
+export class TxtResourceRecord extends ResourceRecord {
+  /** The TXT value. */
+  Txt = '';
+
+  get Payload():Uint8Array {
+    const result = new Uint8Array(this.Txt.length);
+    const view = new DataView(result.buffer);
+  
+    for (let i = 0; i<this.Txt.length; i++) {
+      view.setUint8(i, this.Txt.charCodeAt(i));
+    }
     return result;
   }
 }

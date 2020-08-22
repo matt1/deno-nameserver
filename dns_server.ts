@@ -1,7 +1,7 @@
-import { DNSPacket } from "./dns_packet.ts";
+import { DNSPacket, DNSQuestion } from "./dns_packet.ts";
 import { DNSConfigRecord, DNSConfig } from "./dns_server_config.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
-import { DNSRecordType, AResourceRecord } from "./dns_record_type.ts";
+import { DNSRecordType, AResourceRecord, ResourceRecord, CNameResourceRecord } from "./dns_record_type.ts";
 import { numberToIpv4 } from "./utils.ts";
 
 /** A simple DNS Server. */
@@ -22,7 +22,7 @@ export class DNSServer {
     const recordType = DNSRecordType[question.RecordType];
     
     let config:DNSConfigRecord;
-    let address;
+    let record;
     try {
       config = this.config[question.Name];
       
@@ -30,9 +30,9 @@ export class DNSServer {
       if (!config.class[recordClass]) throw new Error(`No config for class '${recordClass}' for ${question.Name}`);
       if (!config.class[recordClass][recordType]) throw new Error(`No config for type '${recordType}' for ${question.Name}`);
 
-      address = config.class[recordClass][recordType];
+      record = config.class[recordClass][recordType];
 
-      if (!address) throw new Error(`No address`);
+      if (!record) throw new Error(`No record`);
     } catch (error) {
       console.error(`Error handling request: ${error}`);
       return request;
@@ -43,22 +43,32 @@ export class DNSServer {
   }
 
   private createResponse(packet: DNSPacket, config:DNSConfigRecord): Uint8Array {    
-    const recordClass = DNSRecordClass[packet.Question.RecordClass];
-    const recordType = DNSRecordType[packet.Question.RecordType];
-    const address = config.class[recordClass][recordType];
-
     packet.Header.Flags = 32768; // 0x8000
     packet.Header.TotalAnswers = 1;
-
-    // TODO - factory for resource record types.
-    packet.Answer = new AResourceRecord(
-      packet.Question.Name,
-      packet.Question.NameParts,
-      packet.Question.RecordType,
-      packet.Question.RecordClass,
-      config.ttl,
-      numberToIpv4(address),  // TODO: should be handled in the RR.
-    );
+    packet.Answer = this.getResourceRecordType(packet.Question, config);
     return new Uint8Array(packet.Bytes);
+  }
+
+  /** Get an appropriate record type for the question using the config. */
+  private getResourceRecordType(question:DNSQuestion, config:DNSConfigRecord):ResourceRecord {
+    const classConfig = config.class[DNSRecordClass[question.RecordClass]];
+    let rr:ResourceRecord;
+    switch (question.RecordType) {
+      case DNSRecordType.A:
+        rr = new AResourceRecord(question.Name, question.NameParts,
+            question.RecordType, question.RecordClass, config.ttl);
+        (rr as AResourceRecord).Address =
+            numberToIpv4(classConfig[DNSRecordType[DNSRecordType.A]]);
+        break;
+      case DNSRecordType.CNAME:
+        rr = new CNameResourceRecord(question.Name, question.NameParts,
+            question.RecordType, question.RecordClass, config.ttl);
+        (rr as CNameResourceRecord).CName =
+            classConfig[DNSRecordType[DNSRecordType.CNAME]];
+        break;
+      default:
+        throw new Error(`Unable to create Resource Record instance for type ${question.RecordType}`);
+    }
+    return rr;
   }
 }

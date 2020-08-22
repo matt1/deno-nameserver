@@ -14,6 +14,15 @@ export class Config {
       class: {
         'IN': {
           'A': '127.0.0.1',
+          'TXT': 'This is some text.',
+        }
+      }
+    },
+    'alias.example.com': {
+      ttl: 3600,
+      class: {
+        'IN': {
+          'CNAME': 'example.com',
         }
       }
     }

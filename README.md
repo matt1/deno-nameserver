@@ -3,7 +3,9 @@
 ![Tests](https://github.com/matt1/deno-nameserver/workflows/Tests/badge.svg)
 
 This is a very basic experiment at writing a simple DNS server using Deno, using
-the currently-unstable UDP datagram support in Deno (i.e. you have to run with `--unstable`).
+the currently-unstable UDP datagram support in Deno (i.e. you have to run with
+`--unstable`). Vaguely following [RFC1035](https://tools.ietf.org/html/rfc1035),
+but mostly implemented by looking at Wireshark captures. Does not support TCP, so messages need to fit within a single UDP packet.
 
 It is intended to act as a local server to respond to basic queries, and does
 not offer recursive lookups.
@@ -65,8 +67,8 @@ this is something fairly unique among DNS servers. The flip side is that it has
 absolutely zero fault tolerance since it needs to be compiled as it is actually
 typescript code.
 
-
 # Why? Why don't you use `dnsmasq` or whatever?
 
-This was just written for the fun of it. I needed a simple DNS server and I
-thought it would be more fun to write my own than read the docs for dnsmasq.
+This was just written for the fun of it. I needed a simple DNS server for use
+with tailscale and I thought it would be more fun to write my own than read the
+docs for dnsmasq.
