@@ -23,5 +23,5 @@ Deno.test('DNSPacket can be created from raw request bytes', () => {
   assertEquals(packet.Question.RecordClass, DNSRecordClass.IN);
   assertEquals(packet.Question.RecordType, DNSRecordType.A);
 
-  assertEquals(packet.Answer, undefined);
+  assertEquals(packet.Answers.length, 0);
 });

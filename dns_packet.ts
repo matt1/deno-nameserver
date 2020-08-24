@@ -139,7 +139,7 @@ export class DNSPacket {
   private question!: DNSQuestion;
 
   /** Private copy of the answer (there may not be an answer). */
-  private answer!: ResourceRecord | undefined;
+  private answers: ResourceRecord[] = [];
 
   /** Get the header for this packet. */
   get Header(): DNSHeader {
@@ -158,13 +158,8 @@ export class DNSPacket {
   }
 
   /** Get the answer for this packet, if available. */
-  get Answer(): ResourceRecord | undefined {
-    return this.answer;
-  }
-
-  /** Set the answer for this packet. */
-  set Answer(answer:ResourceRecord | undefined) {
-    this.answer = answer;
+  get Answers(): ResourceRecord[] {
+    return this.answers;
   }
 
   /** 
@@ -174,14 +169,15 @@ export class DNSPacket {
   get Bytes(): Uint8Array {
     const header = this.Header.Bytes;
     const question = this.Question.Bytes;
-    const answer = this.Answer?.Bytes;
 
     let parts = [header, question];
     let length = header.length + question.length;
-    if (answer) {
-      length += answer.length;
-      parts.push(answer);
+    for (const answer of this.Answers) {
+      const bytes = answer.Bytes;
+      length += bytes.length;
+      parts.push(bytes);
     }
+
     const result = new Uint8Array(length);
 
     let offset = 0;
