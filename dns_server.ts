@@ -26,7 +26,8 @@ export class DNSServer {
       //
       // This is special processing only for CNAMEs - see the RFC for details:
       // https://tools.ietf.org/html/rfc1034#section-3.6.2
-      if (question.RecordType == DNSRecordType.A || DNSRecordType.AAAA) {
+      if (question.RecordType == DNSRecordType.A || 
+          question.RecordType == DNSRecordType.AAAA) {
         // A record request - handle CNAME special case.
         if (!this.hasRecord(question.Name, question.RecordType)) {
           // No A record found - look for a CNAME and follow it.
