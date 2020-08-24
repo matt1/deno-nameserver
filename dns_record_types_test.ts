@@ -5,7 +5,7 @@ Deno.test('CName correctly returns payload bytes', () => {
   const cname = new CNameResourceRecord();
   cname.CName = 'testing';
   
-  const expected = Uint8Array.from([116, 101, 115, 116, 105, 110, 103]);
+  const expected = Uint8Array.from([7, 116, 101, 115, 116, 105, 110, 103]);
 
   assertEquals(cname.Payload, expected);
 });
