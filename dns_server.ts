@@ -104,10 +104,10 @@ export class DNSServer {
       (rr as AResourceRecord).Address =
           numberToIpv4(classConfig[DNSRecordType[DNSRecordType.A]]);
     } else if (classConfig.hasOwnProperty(DNSRecordType[DNSRecordType.CNAME])) {
+      const name = classConfig[DNSRecordType[DNSRecordType.CNAME]];      
       rr = new CNameResourceRecord(question.Name, question.NameParts,
-          question.RecordType, question.RecordClass, config.ttl);
-      (rr as CNameResourceRecord).CName =
-          classConfig[DNSRecordType[DNSRecordType.CNAME]];
+          DNSRecordType.CNAME, question.RecordClass, config.ttl);
+      (rr as CNameResourceRecord).CName = name;
     }
 
     return rr;
