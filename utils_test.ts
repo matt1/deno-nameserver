@@ -23,4 +23,5 @@ Deno.test('Utils normalises IPv6', () => {
 Deno.test('Utils converts IPv6 address to number', () => {
   assertEquals(ipv6ToNumber('::1'), 1n);
   assertEquals(ipv6ToNumber('2001:db8:0:0:0:0:2:1'), 42540766411282592856903984951653957633n);
+  assertEquals(ipv6ToNumber('2001:db8:0:1:1:1:1:1'), 42540766411282592875351010504635121665n);
 });
