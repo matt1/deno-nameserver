@@ -80,8 +80,7 @@ export class CNameResourceRecord extends ResourceRecord {
   CName = '';
 
   get Payload():Uint8Array {
-    const parts = this.CName.split('.');
-    const result = new Uint8Array(this.CName.length + parts.length);
+    const result = new Uint8Array(this.CName.length + 2);
     const view = new DataView(result.buffer);
   
     let index = 0;
