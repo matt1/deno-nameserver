@@ -62,7 +62,7 @@ export abstract class ResourceRecord {
 /** A Resource Record for 'A' record types. */
 export class AResourceRecord extends ResourceRecord {
   /** The IPv4 address (as a number). */
-  Address: number = 0;
+  Address = 0;
 
   /** Returns the IPv4 address as an unsigned 32 bit int. */
   get Payload():Uint8Array {

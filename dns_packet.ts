@@ -6,12 +6,12 @@ import { DNSRecordClass } from "./dns_record_class.ts";
 
 /** DNS Packet Header. */
 export class DNSHeader {
-  Identification: number = 0;
-  Flags: number = 0;
-  TotalQuestions: number = 0;
-  TotalAnswers: number = 0;
-  TotalAuthorityResourceRecords: number = 0;
-  TotalAdditionalResourceRecords: number = 0;
+  Identification = 0;
+  Flags = 0;
+  TotalQuestions = 0;
+  TotalAnswers = 0;
+  TotalAuthorityResourceRecords = 0;
+  TotalAdditionalResourceRecords = 0;
 
   public toString(): string {
     return `
@@ -56,13 +56,13 @@ export class DNSHeader {
 /** A DNS Packet's Question. */
 export class DNSQuestion {
   /** The human-friendly name */
-  Name: string = "";
+  Name = "";
   /** The separate parts of the name. */
   NameParts: string[] = [];
   /** The Record Type (e.g. A, AAAA etc). */
-  RecordType: number = 0;
+  RecordType = 0;
   /** The Record Class - typically only IN. */
-  RecordClass: number = 0;
+  RecordClass = 0;
 
   public toString() {
     const recordType = DNSRecordType[this.RecordType];
