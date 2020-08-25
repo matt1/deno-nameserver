@@ -2,7 +2,7 @@ import { DNSPacket, DNSQuestion } from "./dns_packet.ts";
 import { DNSConfigRecord, DNSConfig } from "./dns_server_config.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType, AResourceRecord, ResourceRecord, CNameResourceRecord } from "./dns_record_type.ts";
-import { numberToIpv4 } from "./utils.ts";
+import { ipv4ToNumber } from "./utils.ts";
 
 /** A simple DNS Server. */
 export class DNSServer {
@@ -110,7 +110,7 @@ export class DNSServer {
       rr = new AResourceRecord(key, key.split('.'),
           question.RecordType, question.RecordClass, config[key].ttl);
       (rr as AResourceRecord).Address =
-          numberToIpv4(classConfig[DNSRecordType[DNSRecordType.A]]);
+          ipv4ToNumber(classConfig[DNSRecordType[DNSRecordType.A]]);
     } else if (classConfig.hasOwnProperty(DNSRecordType[DNSRecordType.CNAME])) {
       const name = classConfig[DNSRecordType[DNSRecordType.CNAME]];      
       rr = new CNameResourceRecord(key, key.split('.'),
