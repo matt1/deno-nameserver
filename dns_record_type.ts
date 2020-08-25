@@ -61,7 +61,7 @@ export abstract class ResourceRecord {
 
 /** A Resource Record for 'A' record types. */
 export class AResourceRecord extends ResourceRecord {
-  /** The IPv4 address (as a decimal). */
+  /** The IPv4 address (as a number). */
   Address: number = 0;
 
   /** Returns the IPv4 address as an unsigned 32 bit int. */
@@ -70,6 +70,24 @@ export class AResourceRecord extends ResourceRecord {
     const view = new DataView(result.buffer);
   
     view.setUint32(0, this.Address);
+    return result;
+  }
+}
+
+/** A Resource Record for 'AAAA' record types. */
+export class AAAAResourceRecord extends ResourceRecord {
+  /** The IPv6 address */
+  Address: Uint16Array = Uint16Array.from([]);
+
+  /** Returns the IPv6 address as Uint8Array */
+  get Payload():Uint8Array {
+    const result = new Uint8Array(16);
+    const inView = new DataView(this.Address.buffer);
+    const outView = new DataView(result.buffer);
+    
+    for (let i = 0; i<16; i += 2) {
+      outView.setUint16(i, inView.getUint16(i), true);
+    }
     return result;
   }
 }

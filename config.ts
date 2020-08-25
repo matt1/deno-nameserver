@@ -14,6 +14,8 @@ export class Config {
       class: {
         'IN': {
           'A': '127.0.0.1',
+          // TODO: Currently only A is returned as logic in dns_server shortcircuits the AAAA record.
+          'AAAA': '::1',
           'TXT': 'This is some text.',
         }
       }
