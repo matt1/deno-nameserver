@@ -1,4 +1,4 @@
-import { assertEquals, assert, _format} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { hex, ipv4ToNumber, normaliseIpv6, ipv6ToNumber, ipv6ToBytes } from "./utils.ts";
 
 Deno.test('Utils converts IPv4 addresses from strings to ints', () => {
