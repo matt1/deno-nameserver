@@ -1,10 +1,10 @@
 import { DNSServer } from "./dns_server.ts";
-import { Config } from "./config.ts";
+import { ServerConfig } from "./config.ts";
 
-const dnsServer = new DNSServer(Config.NAMES);
+const dnsServer = new DNSServer(ServerConfig.RECORDS);
 const listener = Deno.listenDatagram({
-  port: Config.PORT,
-  hostname: Config.IP,
+  port: ServerConfig.PORT,
+  hostname: ServerConfig.IP,
   transport: 'udp',
 });
 

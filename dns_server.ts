@@ -6,7 +6,12 @@ import { ipv4ToNumber, ipv6ToBytes } from "./utils.ts";
 
 /** A simple DNS Server. */
 export class DNSServer {
-  constructor(private readonly config:DNSConfig){}
+  /**
+   * Creates a new DNSServer.
+   * 
+   * @param records The records that should be served by this server.
+   */
+  constructor(private readonly records:DNSConfig){}
   /**
    * Handles a raw DNS request. Request payload should be the raw datagram
    * content.
@@ -75,7 +80,7 @@ export class DNSServer {
   private hasRecord(name:string,
       recordType:DNSRecordType,
       recordClass:DNSRecordClass = DNSRecordClass.IN): boolean {
-    const config = this.config[name];
+    const config = this.records[name];
     if (!config) return false;
     if (!config.class[DNSRecordClass[recordClass]]) return false;
     if (!config.class[DNSRecordClass[recordClass]][DNSRecordType[recordType]]) return false;
@@ -89,7 +94,7 @@ export class DNSServer {
   private getRecord(name:string,
     recordType:DNSRecordType,
     recordClass:DNSRecordClass = DNSRecordClass.IN): DNSConfig {
-  const config = this.config[name];
+  const config = this.records[name];
 
   if (!config) throw new Error(`No config for ${name}`);
   if (!config.class[DNSRecordClass[recordClass]]) throw new Error(`No config for class '${recordClass}' for ${name}`);
