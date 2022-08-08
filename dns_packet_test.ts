@@ -1,4 +1,4 @@
-import { assertEquals, assert} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { DNSPacket } from "./dns_packet.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType } from "./dns_record_type.ts";
