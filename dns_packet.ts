@@ -127,10 +127,10 @@ export class DNSQuestion {
 /** Represents a DNS packet. */
 export class DNSPacket {
   /** Copy of the raw data. */
-  private readonly rawData: Uint8Array;
+  private rawData!: Uint8Array;
 
   /** Data view onto the raw data. */
-  private readonly data: DataView;
+  private data!: DataView;
 
   /** Private copy of the header. */
   private header!: DNSHeader;
@@ -143,18 +143,18 @@ export class DNSPacket {
 
   /** Get the header for this packet. */
   get Header(): DNSHeader {
-    if (!this.header) {
-      this.header = DNSHeader.Parse(this.data);
-    }
     return this.header;
   }
 
   /** Get the question for this packet. */
   get Question(): DNSQuestion {
-    if (!this.question) {
-      this.question = DNSQuestion.Parse(this.data);
-    }
     return this.question;
+  }
+
+  /** Sets the question for this packet. */
+  set Question(question:DNSQuestion) {
+    this.question = question;
+    this.Header.TotalQuestions++;
   }
 
   /** Get the answer for this packet, if available. */
@@ -162,15 +162,26 @@ export class DNSPacket {
     return this.answers;
   }
 
+  /** Sets the answer for this packet. */
+  set Answers(answers:ResourceRecord[]) {
+    this.answers = answers;
+    this.Header.TotalAnswers++;
+  }
+
   /** 
    * Get the protocol bytes for this packet. Set any packet fields before
    * calling.
    */
   get Bytes(): Uint8Array {
-    const header = this.Header.Bytes;
-    const question = this.Question.Bytes;
+    const header = this.Header?.Bytes;
+    const question = this.Question?.Bytes;
 
-    let parts = [header, question];
+    if (!header || !question) {
+      console.warn('Potentially invalid DNSPacket - missing header or question section');
+      return new Uint8Array();
+    }
+
+    const parts = [header, question];
     let length = header.length + question.length;
     for (const answer of this.Answers) {
       const bytes = answer.Bytes;
@@ -181,18 +192,31 @@ export class DNSPacket {
     const result = new Uint8Array(length);
 
     let offset = 0;
-    for (let array of parts) {
+    for (const array of parts) {
       result.set(array, offset);
       offset += array.length;
     }
     return result;
   }
 
-  /**
-   * Construct a new DNSPacket from the provided UInt8Array.
+  constructor() {
+    this.header = new DNSHeader();
+    this.question = new DNSQuestion();
+    
+  }
+
+  /** 
+   * Construct a new DNSPacket from the provided UInt8Array byte array. Use this to convert
+   * data from the network into a DNSPacket.
    */
-  constructor(data: Uint8Array) {
-    this.rawData = data;
-    this.data = new DataView(data.buffer);
+  static fromBytes(data:Uint8Array): DNSPacket {
+    const packet = new DNSPacket();
+    packet.rawData = data;
+    packet.data = new DataView(data.buffer);
+
+    packet.header = DNSHeader.Parse(packet.data);
+    packet.question = DNSQuestion.Parse(packet.data);
+
+    return packet;
   }
 }

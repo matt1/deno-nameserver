@@ -14,7 +14,7 @@ export class DNSServer {
    * Returns the raw bytes for a DNS response to the request.
    */
   public HandleRequest(request: Uint8Array): Uint8Array {
-    const packet = new DNSPacket(request);
+    const packet = DNSPacket.fromBytes(request);
     const header = packet.Header;
     const question = packet.Question;
     
