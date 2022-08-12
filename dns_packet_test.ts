@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import { DNSPacket } from "./dns_packet.ts";
+import { DNSPacket, DNSQuestion} from "./dns_packet.ts";
 import { DNSRecordClass } from "./dns_record_class.ts";
 import { DNSRecordType } from "./dns_record_type.ts";
 
@@ -43,4 +43,11 @@ Deno.test('DNSPacket can be created programatically', () => {
   packet.Question.RecordType = DNSRecordType.A;
 
   assertEquals(packet.Bytes, sample_packet);
+});
+
+Deno.test('DNSQuestion can be created from constructor', () => {
+  const packet = DNSPacket.fromBytes(sample_packet);
+  const q = new DNSQuestion('example.com');
+  
+  assertEquals(packet.Question, q);
 });

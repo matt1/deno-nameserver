@@ -64,6 +64,15 @@ export class DNSQuestion {
   /** The Record Class - typically only IN. */
   RecordClass = 0;
 
+  constructor(name = "", type = DNSRecordType.A, cls = DNSRecordClass.IN) {
+    if (name === "") return;
+
+    this.Name = name;
+    this.NameParts = name.split('.');
+    this.RecordType = type;
+    this.RecordClass = cls;
+  }
+
   public toString() {
     const recordType = DNSRecordType[this.RecordType];
     const recordClass = DNSRecordClass[this.RecordClass];
